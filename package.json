@@ -1,0 +1,35 @@
+{
+  "name": "graphql-incremental-delivery-examples",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Reference examples for consuming GraphQL incremental delivery in client frameworks.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "check": "tsc -p tsconfig.json --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint examples",
+    "lint:fix": "eslint examples --fix",
+    "test": "tsx --test \"examples/**/__tests__/**/*.test.ts\"",
+    "verify": "npm run format:check && npm run lint && npm run check && npm run test"
+  },
+  "dependencies": {
+    "graphql": "^17.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.9.3",
+    "@types/react": "^19.0.0",
+    "eslint": "^10.5.0",
+    "prettier": "^3.8.0",
+    "prettier-plugin-svelte": "^4.1.1",
+    "react": "^19.0.0",
+    "solid-js": "^1.9.0",
+    "svelte": "^5.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.0",
+    "vue": "^3.5.0"
+  }
+}
