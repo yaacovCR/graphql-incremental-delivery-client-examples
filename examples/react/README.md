@@ -1,12 +1,13 @@
 # React Client Example
 
-This example starts the fake GraphQL execution from a Client Component and
+This example starts GraphQL incremental execution from a Client Component and
 consumes the subsequent incremental results through an `AsyncIterable`.
 
 ## Shape
 
-- `ProductPage.tsx` starts `fakeExecuteIncrementally(ProductPageOperation)` and
-  reads the initial execution promise with React `use()`.
+- `ProductPage.tsx` starts
+  `executeProductPageIncrementally(ProductPageOperation)` and reads the initial
+  execution promise with React `use()`.
 - `IncrementalProvider` creates a `ReactIncrementalStore` and applies each
   subsequent result in an effect. Cleanup closes the async iterator.
 - Streamed lists are exposed through `useSyncExternalStore`.

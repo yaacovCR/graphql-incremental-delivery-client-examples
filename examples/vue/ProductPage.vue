@@ -4,7 +4,7 @@ import { onMounted, onUnmounted } from "vue";
 import type {
   ProductPageExecution,
   ProductPageSubsequentResult,
-} from "../common/fakeExecuteIncrementally";
+} from "../common/executeProductPageIncrementally";
 import { consumeAsyncIterable } from "../common/consumeAsyncIterable";
 import { provideIncrementalClient, VueIncrementalClient } from "./incremental";
 import MoreStuffList from "./MoreStuffList.vue";

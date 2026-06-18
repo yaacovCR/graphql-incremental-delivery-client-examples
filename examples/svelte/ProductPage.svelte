@@ -4,7 +4,7 @@
   import type {
     ProductPageExecution,
     ProductPageSubsequentResult,
-  } from '../common/fakeExecuteIncrementally';
+  } from '../common/executeProductPageIncrementally';
   import { consumeAsyncIterable } from '../common/consumeAsyncIterable';
   import {
     setIncrementalClient,

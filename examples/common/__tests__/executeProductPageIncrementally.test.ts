@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { fakeExecuteIncrementally } from "../fakeExecuteIncrementally.ts";
+import { executeProductPageIncrementally } from "../executeProductPageIncrementally.ts";
 import { ProductPageOperation } from "../ProductPageOperation.ts";
 
-describe("fakeExecuteIncrementally", () => {
-  it("returns the hardcoded ProductPage incremental execution", async () => {
-    const execution = await fakeExecuteIncrementally(ProductPageOperation);
+describe("executeProductPageIncrementally", () => {
+  it("returns the real ProductPage incremental execution", async () => {
+    const execution =
+      await executeProductPageIncrementally(ProductPageOperation);
     const subsequentResults = [];
 
     for await (const result of execution.subsequentResults) {
@@ -25,10 +26,40 @@ describe("fakeExecuteIncrementally", () => {
     assert.equal(subsequentResults.at(-1)?.hasNext, false);
   });
 
+  it("does not normalize GraphQL.js null-prototype result objects", async () => {
+    const execution =
+      await executeProductPageIncrementally(ProductPageOperation);
+    const subsequentResults = [];
+
+    for await (const result of execution.subsequentResults) {
+      subsequentResults.push(result);
+    }
+
+    const deferredPayload = subsequentResults
+      .flatMap((result) => result.incremental ?? [])
+      .find((payload) => "data" in payload);
+    const streamedPayload = subsequentResults
+      .flatMap((result) => result.incremental ?? [])
+      .find((payload) => "items" in payload);
+
+    assert.equal(Object.getPrototypeOf(execution.initialResult.data), null);
+    assert.equal(
+      Object.getPrototypeOf(execution.initialResult.data.stuff),
+      null,
+    );
+    assert.ok(deferredPayload != null && "data" in deferredPayload);
+    assert.equal(Object.getPrototypeOf(deferredPayload.data), null);
+    assert.ok(streamedPayload != null && "items" in streamedPayload);
+    assert.equal(Object.getPrototypeOf(streamedPayload.items[0]), null);
+  });
+
   it("closes the subsequent async iterable without waiting for pending delay", async () => {
-    const execution = await fakeExecuteIncrementally(ProductPageOperation, {
-      delayMs: 100,
-    });
+    const execution = await executeProductPageIncrementally(
+      ProductPageOperation,
+      {
+        delayMs: 100,
+      },
+    );
     const iterator = execution.subsequentResults[Symbol.asyncIterator]();
     const pending = iterator.next();
 
@@ -40,11 +71,11 @@ describe("fakeExecuteIncrementally", () => {
 
   it("fails for any unexpected operation document", async () => {
     await assert.rejects(
-      fakeExecuteIncrementally({
+      executeProductPageIncrementally({
         operationName: "OtherQuery",
         query: "query OtherQuery { stuff { name } }",
       }),
-      /Expected GraphQL operationName/,
+      /ProductPage operation did not produce incremental results/,
     );
   });
 });

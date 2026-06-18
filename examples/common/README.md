@@ -7,10 +7,10 @@ does not define a framework store abstraction.
 ## Files
 
 - `ProductPageOperation.ts` defines the example GraphQL operation, the operation
-  request shape, and the TypeScript result types used by the fake execution.
-- `fakeExecuteIncrementally.ts` is the fake GraphQL server boundary. It
-  validates the expected operation and returns one initial result plus
-  subsequent incremental payloads.
+  request shape, and the TypeScript data types used by the examples.
+- `executeProductPageIncrementally.ts` is the GraphQL execution boundary. It
+  parses and validates the operation, then calls GraphQL.js
+  `experimentalExecuteIncrementally` against a small local ProductPage schema.
 - `consumeAsyncIterable.ts` consumes an async iterable and returns a cleanup
   function that closes the underlying iterator.
 - `createGraphQLError.ts` converts GraphQL formatted errors into an
@@ -26,7 +26,7 @@ does not define a framework store abstraction.
   snapshots.
 - `isPlainObject.ts` is the small structural predicate used by merge and path
   helpers.
-- `__tests__/` contains colocated tests for the fake execution and shared
+- `__tests__/` contains colocated tests for the execution boundary and shared
   incremental payload helpers.
 
 ## Design Boundary

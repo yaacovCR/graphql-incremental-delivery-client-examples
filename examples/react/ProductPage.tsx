@@ -2,7 +2,7 @@
 
 import { Fragment, Suspense, use } from "react";
 
-import { fakeExecuteIncrementally } from "../common/fakeExecuteIncrementally.ts";
+import { executeProductPageIncrementally } from "../common/executeProductPageIncrementally.ts";
 import {
   type MoreStuff,
   ProductPageOperation,
@@ -13,7 +13,7 @@ import {
   useStream,
 } from "./incremental";
 
-const executionPromise = fakeExecuteIncrementally(ProductPageOperation, {
+const executionPromise = executeProductPageIncrementally(ProductPageOperation, {
   delayMs: 250,
 });
 

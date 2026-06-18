@@ -4,9 +4,9 @@ This repository is a set of reference examples for consuming GraphQL.js v17
 incremental delivery results in client frameworks.
 
 It is intentionally not a published package. The shared `examples/common/`
-folder contains small protocol helpers and a fake GraphQL server function. Each
-framework example owns its own reactive bridge so the code uses that framework's
-normal way to sync UI with an updating external source.
+folder contains small protocol helpers and a minimal GraphQL.js execution
+boundary. Each framework example owns its own reactive bridge so the code uses
+that framework's normal way to sync UI with an updating external source.
 
 These examples are rough sketches, not authoritative framework integrations.
 They were written with very little expertise in several of the frameworks shown
@@ -19,8 +19,8 @@ corrections, and more idiomatic versions are welcome.
 - `examples/react-server-components`: React Server Components boundary that
   consumes the GraphQL incremental stream on the server and uses Suspense to
   stream rendered Server Component chunks.
-- `examples/react`: Client-only React. It starts the fake GraphQL execution in
-  the browser and consumes the subsequent async iterable directly.
+- `examples/react`: Client-only React. It starts GraphQL incremental execution
+  in the browser and consumes the subsequent async iterable directly.
 - `examples/vue`: Vue 3 Composition API with `provide`/`inject` and
   `shallowRef`, which is Vue's recommended primitive for integrating external
   state systems.
@@ -29,8 +29,8 @@ corrections, and more idiomatic versions are welcome.
 - `examples/solid`: Solid context, signals for streamed lists, and resources
   for deferred fragments.
 
-All examples send this operation object to `fakeExecuteIncrementally`, which
-stands in for the GraphQL server:
+All examples send this operation object to `executeProductPageIncrementally`,
+which calls GraphQL.js `experimentalExecuteIncrementally`:
 
 ```graphql
 query ProductPage {
@@ -59,19 +59,19 @@ runtime id -> local stream/defer state
 The label is what component code knows. The runtime `id` comes from the current
 GraphQL execution and is only stable within that operation.
 
-## Fake Execution
+## Execution
 
-`examples/common/fakeExecuteIncrementally.ts` is the GraphQL server boundary for
-these examples. It validates that it received the expected GraphQL operation
-document, then returns a hardcoded initial result and subsequent incremental
-payloads. The examples consume the `initialResult` immediately, render deferred
-product details when `productDetails` completes, and render streamed
-`moreStuff` payload batches as they arrive.
+`examples/common/executeProductPageIncrementally.ts` is the GraphQL execution
+boundary for these examples. It parses and validates the operation document,
+then calls GraphQL.js `experimentalExecuteIncrementally` against a small local
+ProductPage schema. The examples consume the `initialResult` immediately,
+render deferred product details when `productDetails` completes, and render
+streamed `moreStuff` payload batches as they arrive.
 
-The React Server Components example calls this fake executor directly in the
-server component and consumes the same async iterable on the server. The
-client-only React, Vue, Svelte, and Solid examples consume the async iterable in
-their browser-side framework bridges.
+The React Server Components example calls this executor directly in the server
+component and consumes the same async iterable on the server. The client-only
+React, Vue, Svelte, and Solid examples consume the async iterable in their
+framework bridges.
 
 ## Scripts
 

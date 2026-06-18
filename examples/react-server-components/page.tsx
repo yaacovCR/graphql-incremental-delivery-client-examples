@@ -1,14 +1,17 @@
 import { Fragment, Suspense } from "react";
 
-import { fakeExecuteIncrementally } from "../common/fakeExecuteIncrementally.ts";
+import { executeProductPageIncrementally } from "../common/executeProductPageIncrementally.ts";
 import type { MoreStuff } from "../common/ProductPageOperation.ts";
 import { ProductPageOperation } from "../common/ProductPageOperation.ts";
 import { ReactServerIncrementalStore } from "./incremental";
 
 export default async function ProductPage() {
-  const execution = await fakeExecuteIncrementally(ProductPageOperation, {
-    delayMs: 250,
-  });
+  const execution = await executeProductPageIncrementally(
+    ProductPageOperation,
+    {
+      delayMs: 250,
+    },
+  );
   const incremental = new ReactServerIncrementalStore(
     execution.initialResult,
     execution.subsequentResults,

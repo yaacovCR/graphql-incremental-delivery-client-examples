@@ -1,6 +1,6 @@
 /* @jsxImportSource solid-js */
 import { For, Suspense } from "solid-js";
-import type { ProductPageExecution } from "../common/fakeExecuteIncrementally.ts";
+import type { ProductPageExecution } from "../common/executeProductPageIncrementally.ts";
 import {
   IncrementalClientContext,
   SolidIncrementalClient,

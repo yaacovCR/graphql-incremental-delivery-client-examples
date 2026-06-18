@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
-  fakeExecuteIncrementally,
+  executeProductPageIncrementally,
   type ProductPageSubsequentResult,
-} from "../../common/fakeExecuteIncrementally.ts";
+} from "../../common/executeProductPageIncrementally.ts";
 import { ProductPageOperation } from "../../common/ProductPageOperation.ts";
 import { ReactServerIncrementalStore } from "../incremental.ts";
 
@@ -12,7 +12,8 @@ const streamId = "stream:moreStuff";
 
 describe("ReactServerIncrementalStore", () => {
   it("reads queued stream batches in growing reveal groups", async () => {
-    const execution = await fakeExecuteIncrementally(ProductPageOperation);
+    const execution =
+      await executeProductPageIncrementally(ProductPageOperation);
     const store = new ReactServerIncrementalStore(
       execution.initialResult,
       execution.subsequentResults,
@@ -103,7 +104,8 @@ describe("ReactServerIncrementalStore", () => {
   });
 
   it("resolves deferred fragments by label and response path", async () => {
-    const execution = await fakeExecuteIncrementally(ProductPageOperation);
+    const execution =
+      await executeProductPageIncrementally(ProductPageOperation);
     const store = new ReactServerIncrementalStore(
       execution.initialResult,
       execution.subsequentResults,

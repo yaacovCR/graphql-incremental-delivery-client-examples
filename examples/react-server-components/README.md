@@ -1,12 +1,13 @@
 # React Server Components Example
 
 This example models a React Server Components boundary. The server component
-starts the fake GraphQL execution, keeps the GraphQL incremental stream on the
-server, and uses Suspense to stream rendered Server Component chunks.
+starts GraphQL incremental execution, keeps the GraphQL incremental stream on
+the server, and uses Suspense to stream rendered Server Component chunks.
 
 ## Shape
 
-- `page.tsx` runs `fakeExecuteIncrementally(ProductPageOperation)` on the server.
+- `page.tsx` runs `executeProductPageIncrementally(ProductPageOperation)` on
+  the server.
 - `incremental.ts` contains the server-side incremental store. It consumes the
   GraphQL `AsyncIterable` and resolves pending stream batches or deferred
   fragments as payloads arrive.
