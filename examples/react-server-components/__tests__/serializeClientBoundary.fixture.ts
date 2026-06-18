@@ -34,14 +34,23 @@ const stream = await renderToReadableStream(
   },
 );
 
+const decoder = new TextDecoder();
+let serialized = "";
 const reader = stream.getReader();
-while (!(await reader.read()).done) {
+while (true) {
+  const result = await reader.read();
+  if (result.done) {
+    break;
+  }
+  serialized += decoder.decode(result.value, { stream: true });
   // Keep reading so React serializes every referenced prop.
 }
+serialized += decoder.decode();
 
 console.log(
   JSON.stringify({
     messages,
+    serializedIncludesNullPrototypeMarker: serialized.includes("$p"),
     summaryPrototypeIsNull: Object.getPrototypeOf(summary) === null,
   }),
 );

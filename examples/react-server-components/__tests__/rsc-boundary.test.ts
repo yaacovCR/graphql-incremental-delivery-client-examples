@@ -4,7 +4,7 @@ import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 
 describe("React Server Components client boundary", () => {
-  it("rejects the raw GraphQL.js null-prototype object passed to a Client Component", () => {
+  it("serializes the raw GraphQL.js null-prototype object passed to a Client Component", () => {
     const fixturePath = fileURLToPath(
       new URL("./serializeClientBoundary.fixture.ts", import.meta.url),
     );
@@ -21,13 +21,12 @@ describe("React Server Components client boundary", () => {
 
     const payload = JSON.parse(result.stdout) as {
       messages: Array<string>;
+      serializedIncludesNullPrototypeMarker: boolean;
       summaryPrototypeIsNull: boolean;
     };
 
     assert.equal(payload.summaryPrototypeIsNull, true);
-    assert.match(
-      payload.messages.join("\n"),
-      /Only plain objects, and a few built-ins, can be passed to Client Components from Server Components\. Classes or null prototypes are not supported\./,
-    );
+    assert.deepEqual(payload.messages, []);
+    assert.equal(payload.serializedIncludesNullPrototypeMarker, true);
   });
 });

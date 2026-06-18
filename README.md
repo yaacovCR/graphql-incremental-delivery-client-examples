@@ -86,8 +86,10 @@ framework bridges.
 
 The React Server Components example also passes the initial
 `product.summary` object into a Client Component. The test suite exercises that
-path with `react-server-dom-webpack` and shows that the raw GraphQL.js
-null-prototype object is rejected by the React Server Components serializer.
+path with `react-server-dom-webpack` and a local dependency patch for React's
+null-prototype object serialization support, so the raw GraphQL.js
+null-prototype object can cross the Server-to-Client boundary without being
+normalized first.
 
 ## Scripts
 

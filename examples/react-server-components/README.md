@@ -31,14 +31,15 @@ as batches, not individual items: the store preserves GraphQL payload batches,
 and the Server Component renders one or more payload batches per Suspense
 reveal.
 
-## Friction Points
+## Notes
 
 - GraphQL.js execution result objects have null prototypes. Passing
   `product.summary` directly to `ProductSummaryCard` crosses the RSC
-  Server-to-Client boundary with one of those objects. The
-  `rsc-boundary.test.ts` fixture runs the real React Server Components
-  serializer and confirms React rejects that value with the "Classes or null
-  prototypes are not supported" error.
+  Server-to-Client boundary with one of those objects. This repository applies a
+  local `react-server-dom-webpack` postinstall patch for React's
+  null-prototype object serialization support, and `rsc-boundary.test.ts`
+  confirms the raw GraphQL.js object serializes with React's null-prototype
+  marker.
 - A recursive Suspense shape can create too many nested boundaries if it reveals
   every small `@stream` payload separately. This example resolves that by
   buffering payload batches into geometric reveal groups: the first reveal uses
