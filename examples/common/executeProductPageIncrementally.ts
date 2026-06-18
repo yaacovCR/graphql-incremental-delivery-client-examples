@@ -1,6 +1,8 @@
 import {
   GraphQLDeferDirective,
+  GraphQLFloat,
   GraphQLID,
+  GraphQLInt,
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
@@ -19,9 +21,12 @@ import { experimentalExecuteIncrementally } from "graphql/execution";
 
 import {
   type GraphQLOperationRequest,
-  type MoreStuff,
+  type Product,
   type ProductDetailsData,
   type ProductPageData,
+  type ProductSpecification,
+  type ProductSummary,
+  type Recommendation,
 } from "./ProductPageOperation.ts";
 
 interface ProductPageContext {
@@ -29,48 +34,83 @@ interface ProductPageContext {
   signal: AbortSignal;
 }
 
-interface StuffSource {
-  description: string;
-  name: string;
-}
-
 interface ExecuteProductPageIncrementallyOptions {
   delayMs?: number;
 }
 
 export type ProductPageSubsequentResult =
-  FormattedSubsequentIncrementalExecutionResult<ProductDetailsData, MoreStuff>;
+  FormattedSubsequentIncrementalExecutionResult<
+    ProductDetailsData,
+    Recommendation
+  >;
 
 export type ProductPageExecution =
   FormattedExperimentalIncrementalExecutionResults<
     ProductPageData,
     ProductDetailsData,
-    MoreStuff
+    Recommendation
   >;
 
 const productPageData: {
-  moreStuff: ReadonlyArray<MoreStuff>;
-  stuff: StuffSource;
+  product: Product & ProductDetailsData;
+  recommendations: ReadonlyArray<Recommendation>;
 } = {
-  moreStuff: [
-    { id: "a", name: "First streamed item" },
-    { id: "b", name: "Second streamed item" },
-  ],
-  stuff: {
-    description: "Deferred product details.",
-    name: "Initial product data",
+  product: {
+    description:
+      "A countertop brewer with staged water delivery for repeatable pour-over style batches.",
+    id: "brewer-01",
+    name: "Incremental Coffee Brewer",
+    specifications: [
+      { label: "Brew modes", value: "Classic, bloom, cold brew" },
+      { label: "Carafe", value: "1.2L thermal" },
+    ],
+    summary: {
+      inventoryStatus: "Ready to ship",
+      rating: 4.8,
+      reviewCount: 128,
+    },
   },
+  recommendations: [
+    {
+      id: "filters",
+      name: "Reusable filter set",
+      reason: "Sized for the brewer basket.",
+    },
+    {
+      id: "scale",
+      name: "Precision coffee scale",
+      reason: "Pairs with bloom timing.",
+    },
+  ],
 };
 
-const MoreStuffType = new GraphQLObjectType<MoreStuff, ProductPageContext>({
+const ProductSummaryType = new GraphQLObjectType<
+  ProductSummary,
+  ProductPageContext
+>({
   fields: {
-    id: { type: new GraphQLNonNull(GraphQLID) },
-    name: { type: new GraphQLNonNull(GraphQLString) },
+    inventoryStatus: { type: new GraphQLNonNull(GraphQLString) },
+    rating: { type: new GraphQLNonNull(GraphQLFloat) },
+    reviewCount: { type: new GraphQLNonNull(GraphQLInt) },
   },
-  name: "MoreStuff",
+  name: "ProductSummary",
 });
 
-const StuffType = new GraphQLObjectType<StuffSource, ProductPageContext>({
+const ProductSpecificationType = new GraphQLObjectType<
+  ProductSpecification,
+  ProductPageContext
+>({
+  fields: {
+    label: { type: new GraphQLNonNull(GraphQLString) },
+    value: { type: new GraphQLNonNull(GraphQLString) },
+  },
+  name: "ProductSpecification",
+});
+
+const ProductType = new GraphQLObjectType<
+  Product & ProductDetailsData,
+  ProductPageContext
+>({
   fields: {
     description: {
       resolve: async (source, _args, context) => {
@@ -79,23 +119,42 @@ const StuffType = new GraphQLObjectType<StuffSource, ProductPageContext>({
       },
       type: new GraphQLNonNull(GraphQLString),
     },
+    id: { type: new GraphQLNonNull(GraphQLID) },
     name: { type: new GraphQLNonNull(GraphQLString) },
+    specifications: {
+      type: new GraphQLNonNull(
+        new GraphQLList(new GraphQLNonNull(ProductSpecificationType)),
+      ),
+    },
+    summary: { type: new GraphQLNonNull(ProductSummaryType) },
   },
-  name: "Stuff",
+  name: "Product",
+});
+
+const RecommendationType = new GraphQLObjectType<
+  Recommendation,
+  ProductPageContext
+>({
+  fields: {
+    id: { type: new GraphQLNonNull(GraphQLID) },
+    name: { type: new GraphQLNonNull(GraphQLString) },
+    reason: { type: new GraphQLNonNull(GraphQLString) },
+  },
+  name: "Recommendation",
 });
 
 const QueryType = new GraphQLObjectType<unknown, ProductPageContext>({
   fields: {
-    moreStuff: {
-      resolve: (_source, _args, context) =>
-        createMoreStuffStream(productPageData.moreStuff, context),
-      type: new GraphQLNonNull(
-        new GraphQLList(new GraphQLNonNull(MoreStuffType)),
-      ),
+    product: {
+      resolve: () => productPageData.product,
+      type: new GraphQLNonNull(ProductType),
     },
-    stuff: {
-      resolve: () => productPageData.stuff,
-      type: new GraphQLNonNull(StuffType),
+    recommendations: {
+      resolve: (_source, _args, context) =>
+        createRecommendationStream(productPageData.recommendations, context),
+      type: new GraphQLNonNull(
+        new GraphQLList(new GraphQLNonNull(RecommendationType)),
+      ),
     },
   },
   name: "Query",
@@ -150,10 +209,10 @@ export async function executeProductPageIncrementally(
   } as unknown as ProductPageExecution;
 }
 
-async function* createMoreStuffStream(
-  items: ReadonlyArray<MoreStuff>,
+async function* createRecommendationStream(
+  items: ReadonlyArray<Recommendation>,
   context: ProductPageContext,
-): AsyncIterable<MoreStuff> {
+): AsyncIterable<Recommendation> {
   for (const item of items) {
     await waitForDeliveryDelay(context.delayMs, context.signal);
     yield item;

@@ -9,9 +9,9 @@ const exampleDir = dirname(dirname(fileURLToPath(import.meta.url)));
 
 describe("Vue components", () => {
   for (const fileName of [
-    "MoreStuffList.vue",
     "ProductDetails.vue",
     "ProductPage.vue",
+    "RecommendationsList.vue",
   ]) {
     it(`compiles ${fileName}`, () => {
       const filePath = join(exampleDir, fileName);

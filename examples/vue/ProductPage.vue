@@ -7,8 +7,8 @@ import type {
 } from "../common/executeProductPageIncrementally";
 import { consumeAsyncIterable } from "../common/consumeAsyncIterable";
 import { provideIncrementalClient, VueIncrementalClient } from "./incremental";
-import MoreStuffList from "./MoreStuffList.vue";
 import ProductDetails from "./ProductDetails.vue";
+import RecommendationsList from "./RecommendationsList.vue";
 
 const props = defineProps<{
   initialResult: ProductPageExecution["initialResult"];
@@ -32,7 +32,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <h1>{{ initialResult.data.stuff.name }}</h1>
+  <h1>{{ initialResult.data.product.name }}</h1>
   <ProductDetails />
-  <MoreStuffList />
+  <RecommendationsList />
 </template>

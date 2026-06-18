@@ -12,7 +12,7 @@ for incremental snapshots.
 - `useStream` and `useDeferredFragment` return Svelte `Readable` stores.
 - Components use `$store` syntax to render the latest stream or deferred
   snapshot.
-- Product details use `@defer`; the `moreStuff` list uses `@stream`.
+- Product details use `@defer`; the recommendations list uses `@stream`.
 
 ## Incremental Delivery Fit
 
@@ -20,9 +20,8 @@ Svelte stores fit the snapshot API directly. The bridge keeps writable stores
 internally, exposes readable stores to components, and applies the immutable
 reducer logic from `examples/common`.
 
-The stream case is especially direct: the list component renders
-`$moreStuff.batches`, while the deferred product details render from their own
-store.
+The stream case is especially direct: the list component renders recommendation
+batches, while the deferred product details render from their own store.
 
 ## Friction Points
 

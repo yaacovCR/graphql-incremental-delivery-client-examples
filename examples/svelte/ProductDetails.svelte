@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { useDeferredFragment } from './incremental';
+  import { useDeferredFragment } from "./incremental";
 
   const details = useDeferredFragment<{ description: string }>(
-    'productDetails',
-    ['stuff'],
+    "productDetails",
+    ["product"],
   );
 </script>
 

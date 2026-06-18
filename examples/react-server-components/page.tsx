@@ -1,9 +1,10 @@
 import { Fragment, Suspense } from "react";
 
 import { executeProductPageIncrementally } from "../common/executeProductPageIncrementally.ts";
-import type { MoreStuff } from "../common/ProductPageOperation.ts";
+import type { Recommendation } from "../common/ProductPageOperation.ts";
 import { ProductPageOperation } from "../common/ProductPageOperation.ts";
 import { ReactServerIncrementalStore } from "./incremental";
+import { ProductSummaryCard } from "./ProductSummary.client";
 
 export default async function ProductPage() {
   const execution = await executeProductPageIncrementally(
@@ -19,32 +20,39 @@ export default async function ProductPage() {
 
   return (
     <>
-      <h1>{execution.initialResult.data.stuff.name}</h1>
+      <h1>{execution.initialResult.data.product.name}</h1>
+      <ProductSummaryCard
+        summary={execution.initialResult.data.product.summary}
+      />
       <Suspense fallback={<p>Loading product details...</p>}>
         <ProductDetails incremental={incremental} />
       </Suspense>
-      <MoreStuffList incremental={incremental} />
+      <RecommendationsList incremental={incremental} />
     </>
   );
 }
 
-function MoreStuffList(props: { incremental: ReactServerIncrementalStore }) {
+function RecommendationsList(props: {
+  incremental: ReactServerIncrementalStore;
+}) {
   return (
     <section>
       <ul>
         <Suspense fallback={<li>Loading more...</li>}>
-          <MoreStuffBatches incremental={props.incremental} />
+          <RecommendationBatches incremental={props.incremental} />
         </Suspense>
       </ul>
     </section>
   );
 }
 
-async function MoreStuffBatches(props: {
+async function RecommendationBatches(props: {
   incremental: ReactServerIncrementalStore;
 }) {
   const batches =
-    await props.incremental.nextStreamBatches<MoreStuff>("moreStuff");
+    await props.incremental.nextStreamBatches<Recommendation>(
+      "recommendations",
+    );
   if (batches == null) {
     return null;
   }
@@ -59,7 +67,7 @@ async function MoreStuffBatches(props: {
         </Fragment>
       ))}
       <Suspense fallback={<li>Loading more...</li>}>
-        <MoreStuffBatches incremental={props.incremental} />
+        <RecommendationBatches incremental={props.incremental} />
       </Suspense>
     </>
   );
@@ -70,7 +78,20 @@ async function ProductDetails(props: {
 }) {
   const details = await props.incremental.deferredFragment<{
     description: string;
-  }>("productDetails", ["stuff"]);
+    specifications: Array<{ label: string; value: string }>;
+  }>("productDetails", ["product"]);
 
-  return <p>{details.description}</p>;
+  return (
+    <section>
+      <p>{details.description}</p>
+      <dl>
+        {details.specifications.map((specification) => (
+          <Fragment key={specification.label}>
+            <dt>{specification.label}</dt>
+            <dd>{specification.value}</dd>
+          </Fragment>
+        ))}
+      </dl>
+    </section>
+  );
 }

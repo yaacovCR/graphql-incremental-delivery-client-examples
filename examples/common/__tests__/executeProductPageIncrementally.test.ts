@@ -15,12 +15,12 @@ describe("executeProductPageIncrementally", () => {
     }
 
     assert.equal(
-      execution.initialResult.data.stuff.name,
-      "Initial product data",
+      execution.initialResult.data.product.name,
+      "Incremental Coffee Brewer",
     );
     assert.deepEqual(
       execution.initialResult.pending.map((pending) => pending.label),
-      ["productDetails", "moreStuff"],
+      ["productDetails", "recommendations"],
     );
     assert.equal(subsequentResults.length, 3);
     assert.equal(subsequentResults.at(-1)?.hasNext, false);
@@ -44,7 +44,11 @@ describe("executeProductPageIncrementally", () => {
 
     assert.equal(Object.getPrototypeOf(execution.initialResult.data), null);
     assert.equal(
-      Object.getPrototypeOf(execution.initialResult.data.stuff),
+      Object.getPrototypeOf(execution.initialResult.data.product),
+      null,
+    );
+    assert.equal(
+      Object.getPrototypeOf(execution.initialResult.data.product.summary),
       null,
     );
     assert.ok(deferredPayload != null && "data" in deferredPayload);
@@ -75,7 +79,7 @@ describe("executeProductPageIncrementally", () => {
         operationName: "OtherQuery",
         query: "query OtherQuery { stuff { name } }",
       }),
-      /ProductPage operation did not produce incremental results/,
+      /GraphQL validation failed/,
     );
   });
 });

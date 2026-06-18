@@ -8,7 +8,7 @@ import {
 import { ProductPageOperation } from "../../common/ProductPageOperation.ts";
 import { ReactServerIncrementalStore } from "../incremental.ts";
 
-const streamId = "stream:moreStuff";
+const streamId = "stream:recommendations";
 
 describe("ReactServerIncrementalStore", () => {
   it("reads queued stream batches in growing reveal groups", async () => {
@@ -20,15 +20,15 @@ describe("ReactServerIncrementalStore", () => {
     );
 
     const first = await store.nextStreamBatches<{ id: string; name: string }>(
-      "moreStuff",
+      "recommendations",
     );
     const second = await store.nextStreamBatches<{ id: string; name: string }>(
-      "moreStuff",
+      "recommendations",
     );
-    const done = await store.nextStreamBatches("moreStuff");
+    const done = await store.nextStreamBatches("recommendations");
 
-    assert.deepEqual(itemIds(first), ["a"]);
-    assert.deepEqual(itemIds(second), ["b"]);
+    assert.deepEqual(itemIds(first), ["filters"]);
+    assert.deepEqual(itemIds(second), ["scale"]);
     assert.equal(done, undefined);
   });
 
@@ -36,17 +36,17 @@ describe("ReactServerIncrementalStore", () => {
     const store = createStreamStore(streamResults(["a", "b"]));
 
     const batches = await store.nextStreamBatches<{ id: string; name: string }>(
-      "moreStuff",
+      "recommendations",
     );
-    const done = await store.nextStreamBatches("moreStuff");
+    const done = await store.nextStreamBatches("recommendations");
 
     assert.equal(batches?.length, 1);
     assert.deepEqual(itemIds(batches), ["a", "b"]);
     assert.deepEqual(
       batches?.flatMap((batch) => batch.map((entry) => entry.path)),
       [
-        ["moreStuff", 0],
-        ["moreStuff", 1],
+        ["recommendations", 0],
+        ["recommendations", 1],
       ],
     );
     assert.equal(done, undefined);
@@ -58,15 +58,15 @@ describe("ReactServerIncrementalStore", () => {
     );
 
     const first = await store.nextStreamBatches<{ id: string; name: string }>(
-      "moreStuff",
+      "recommendations",
     );
     const second = await store.nextStreamBatches<{ id: string; name: string }>(
-      "moreStuff",
+      "recommendations",
     );
     const third = await store.nextStreamBatches<{ id: string; name: string }>(
-      "moreStuff",
+      "recommendations",
     );
-    const done = await store.nextStreamBatches("moreStuff");
+    const done = await store.nextStreamBatches("recommendations");
 
     assert.deepEqual(itemIds(first), ["a"]);
     assert.deepEqual(itemIds(second), ["b", "c"]);
@@ -80,12 +80,12 @@ describe("ReactServerIncrementalStore", () => {
     );
 
     const first = await store.nextStreamBatches<{ id: string; name: string }>(
-      "moreStuff",
+      "recommendations",
     );
     const second = await store.nextStreamBatches<{ id: string; name: string }>(
-      "moreStuff",
+      "recommendations",
     );
-    const done = await store.nextStreamBatches("moreStuff");
+    const done = await store.nextStreamBatches("recommendations");
 
     assert.deepEqual(itemIds(first), ["a", "b", "c"]);
     assert.deepEqual(itemIds(second), ["d", "e", "f", "g", "h", "i"]);
@@ -96,11 +96,14 @@ describe("ReactServerIncrementalStore", () => {
     const store = createStreamStore(streamErrorResult());
 
     const batches = await store.nextStreamBatches<{ id: string; name: string }>(
-      "moreStuff",
+      "recommendations",
     );
 
     assert.deepEqual(itemIds(batches), ["a"]);
-    await assert.rejects(() => store.nextStreamBatches("moreStuff"), /failed/);
+    await assert.rejects(
+      () => store.nextStreamBatches("recommendations"),
+      /failed/,
+    );
   });
 
   it("resolves deferred fragments by label and response path", async () => {
@@ -113,10 +116,13 @@ describe("ReactServerIncrementalStore", () => {
 
     const details = await store.deferredFragment<{ description: string }>(
       "productDetails",
-      ["stuff"],
+      ["product"],
     );
 
-    assert.equal(details.description, "Deferred product details.");
+    assert.equal(
+      details.description,
+      "A countertop brewer with staged water delivery for repeatable pour-over style batches.",
+    );
   });
 });
 
@@ -125,9 +131,15 @@ function createStreamStore(
 ): ReactServerIncrementalStore {
   return new ReactServerIncrementalStore(
     {
-      data: { moreStuff: [] },
+      data: { recommendations: [] },
       hasNext: true,
-      pending: [{ id: streamId, label: "moreStuff", path: ["moreStuff"] }],
+      pending: [
+        {
+          id: streamId,
+          label: "recommendations",
+          path: ["recommendations"],
+        },
+      ],
     },
     subsequentResults,
   );
@@ -143,7 +155,11 @@ async function* streamResults(
       incremental: [
         {
           id: streamId,
-          items: batch.map((id) => ({ id, name: id.toUpperCase() })),
+          items: batch.map((id) => ({
+            id,
+            name: id.toUpperCase(),
+            reason: `${id.toUpperCase()} reason`,
+          })),
         },
       ],
     };
@@ -168,7 +184,7 @@ async function* streamErrorResult(): AsyncIterable<ProductPageSubsequentResult> 
     incremental: [
       {
         id: streamId,
-        items: [{ id: "a", name: "A" }],
+        items: [{ id: "a", name: "A", reason: "A reason" }],
       },
     ],
   };

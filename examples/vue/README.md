@@ -11,7 +11,7 @@ This example uses Vue 3's Composition API with `provide`/`inject` and
   the client. `onUnmounted` closes the async iterator.
 - `useStream` and `useDeferredFragment` return readonly `ShallowRef` values.
 - Components read the current stream or deferred snapshot directly in templates.
-- Product details use `@defer`; the `moreStuff` list uses `@stream`.
+- Product details use `@defer`; the recommendations list uses `@stream`.
 
 ## Incremental Delivery Fit
 
@@ -21,7 +21,7 @@ whole snapshot after each payload, so Vue tracks the top-level snapshot change
 without deeply proxying GraphQL result data.
 
 The template syntax is concise for streamed lists: nested `v-for` blocks render
-`moreStuff.batches`, while the deferred product details render in a separate
+recommendation batches, while the deferred product details render in a separate
 component.
 
 ## Friction Points

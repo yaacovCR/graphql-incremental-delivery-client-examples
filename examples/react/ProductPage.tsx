@@ -4,7 +4,7 @@ import { Fragment, Suspense, use } from "react";
 
 import { executeProductPageIncrementally } from "../common/executeProductPageIncrementally.ts";
 import {
-  type MoreStuff,
+  type Recommendation,
   ProductPageOperation,
 } from "../common/ProductPageOperation.ts";
 import {
@@ -33,17 +33,17 @@ function ProductPageContent() {
       initialResult={execution.initialResult}
       subsequentResults={execution.subsequentResults}
     >
-      <h1>{execution.initialResult.data.stuff.name}</h1>
+      <h1>{execution.initialResult.data.product.name}</h1>
       <Suspense fallback={<p>Loading product details...</p>}>
         <ProductDetails />
       </Suspense>
-      <MoreStuffList />
+      <RecommendationsList />
     </IncrementalProvider>
   );
 }
 
-function MoreStuffList() {
-  const stream = useStream<MoreStuff>("moreStuff");
+function RecommendationsList() {
+  const stream = useStream<Recommendation>("recommendations");
 
   return (
     <section>
@@ -62,10 +62,22 @@ function MoreStuffList() {
 }
 
 function ProductDetails() {
-  const details = useDeferredFragment<{ description: string }>(
-    "productDetails",
-    ["stuff"],
-  );
+  const details = useDeferredFragment<{
+    description: string;
+    specifications: Array<{ label: string; value: string }>;
+  }>("productDetails", ["product"]);
 
-  return <p>{details.description}</p>;
+  return (
+    <section>
+      <p>{details.description}</p>
+      <dl>
+        {details.specifications.map((specification) => (
+          <Fragment key={specification.label}>
+            <dt>{specification.label}</dt>
+            <dd>{specification.value}</dd>
+          </Fragment>
+        ))}
+      </dl>
+    </section>
+  );
 }
