@@ -11,6 +11,7 @@
     "format:check": "prettier --check .",
     "lint": "eslint examples",
     "lint:fix": "eslint examples --fix",
+    "postinstall": "node scripts/patch-react-rsc-null-prototype.mjs",
     "test": "tsx --test \"examples/**/__tests__/**/*.test.ts\"",
     "verify": "npm run format:check && npm run lint && npm run check && npm run test"
   },
