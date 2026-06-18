@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { useStream } from "./incremental";
 
-const moreStuff = useStream<{ id: string; name: string }>("moreStuff");
+const recommendations = useStream<{ id: string; name: string }>(
+  "recommendations",
+);
 </script>
 
 <template>
   <ul>
     <template
-      v-for="(batch, batchIndex) in moreStuff.batches"
+      v-for="(batch, batchIndex) in recommendations.batches"
       :key="batchIndex"
     >
       <li v-for="entry in batch" :key="entry.item.id">

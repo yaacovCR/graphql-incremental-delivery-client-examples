@@ -13,7 +13,7 @@ consumes the subsequent incremental results through an `AsyncIterable`.
 - Streamed lists are exposed through `useSyncExternalStore`.
 - Deferred fragments are exposed as promises and read with React `use()`, so
   colocated `<Suspense>` boundaries handle loading.
-- Product details use `@defer`; the `moreStuff` list uses `@stream`.
+- Product details use `@defer`; the recommendations list uses `@stream`.
 
 ## Incremental Delivery Fit
 

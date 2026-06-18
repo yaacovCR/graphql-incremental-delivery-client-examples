@@ -12,7 +12,7 @@ for deferred fragments.
   `createResource`.
 - Components render streamed batches with `<For>` and product details inside
   `<Suspense>`.
-- Product details use `@defer`; the `moreStuff` list uses `@stream`.
+- Product details use `@defer`; the recommendations list uses `@stream`.
 
 ## Incremental Delivery Fit
 

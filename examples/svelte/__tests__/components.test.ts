@@ -9,9 +9,9 @@ const exampleDir = dirname(dirname(fileURLToPath(import.meta.url)));
 
 describe("Svelte components", () => {
   for (const fileName of [
-    "MoreStuffList.svelte",
     "ProductDetails.svelte",
     "ProductPage.svelte",
+    "RecommendationsList.svelte",
   ]) {
     it(`compiles ${fileName}`, () => {
       const filePath = join(exampleDir, fileName);

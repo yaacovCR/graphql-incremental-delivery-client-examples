@@ -1,23 +1,20 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount } from "svelte";
 
   import type {
     ProductPageExecution,
     ProductPageSubsequentResult,
-  } from '../common/executeProductPageIncrementally';
-  import { consumeAsyncIterable } from '../common/consumeAsyncIterable';
-  import {
-    setIncrementalClient,
-    SvelteIncrementalClient,
-  } from './incremental';
-  import MoreStuffList from './MoreStuffList.svelte';
-  import ProductDetails from './ProductDetails.svelte';
+  } from "../common/executeProductPageIncrementally";
+  import { consumeAsyncIterable } from "../common/consumeAsyncIterable";
+  import { setIncrementalClient, SvelteIncrementalClient } from "./incremental";
+  import ProductDetails from "./ProductDetails.svelte";
+  import RecommendationsList from "./RecommendationsList.svelte";
 
   let {
     initialResult,
     subsequentResults,
   }: {
-    initialResult: ProductPageExecution['initialResult'];
+    initialResult: ProductPageExecution["initialResult"];
     subsequentResults: AsyncIterable<ProductPageSubsequentResult>;
   } = $props();
 
@@ -31,6 +28,6 @@
   });
 </script>
 
-<h1>{initialResult.data.stuff.name}</h1>
+<h1>{initialResult.data.product.name}</h1>
 <ProductDetails />
-<MoreStuffList />
+<RecommendationsList />

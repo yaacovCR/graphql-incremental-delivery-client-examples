@@ -14,17 +14,17 @@ export function ProductPage(props: ProductPageExecution) {
 
   return (
     <IncrementalClientContext.Provider value={client}>
-      <h1>{props.initialResult.data.stuff.name}</h1>
+      <h1>{props.initialResult.data.product.name}</h1>
       <Suspense fallback={<p>Loading product details...</p>}>
         <ProductDetails />
       </Suspense>
-      <MoreStuffList />
+      <RecommendationsList />
     </IncrementalClientContext.Provider>
   );
 }
 
-function MoreStuffList() {
-  const stream = useStream<{ id: string; name: string }>("moreStuff");
+function RecommendationsList() {
+  const stream = useStream<{ id: string; name: string }>("recommendations");
 
   return (
     <ul>
@@ -40,7 +40,7 @@ function MoreStuffList() {
 function ProductDetails() {
   const details = useDeferredFragment<{ description: string }>(
     "productDetails",
-    ["stuff"],
+    ["product"],
   );
 
   return <p>{details()?.description}</p>;

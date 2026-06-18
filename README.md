@@ -34,18 +34,29 @@ which calls GraphQL.js `experimentalExecuteIncrementally`:
 
 ```graphql
 query ProductPage {
-  stuff {
-    name
-    ...ProductDetails @defer(label: "productDetails")
-  }
-  moreStuff @stream(initialCount: 0, label: "moreStuff") {
+  product {
     id
     name
+    summary {
+      inventoryStatus
+      rating
+      reviewCount
+    }
+    ...ProductDetails @defer(label: "productDetails")
+  }
+  recommendations @stream(initialCount: 0, label: "recommendations") {
+    id
+    name
+    reason
   }
 }
 
-fragment ProductDetails on Stuff {
+fragment ProductDetails on Product {
   description
+  specifications {
+    label
+    value
+  }
 }
 ```
 
@@ -66,12 +77,17 @@ boundary for these examples. It parses and validates the operation document,
 then calls GraphQL.js `experimentalExecuteIncrementally` against a small local
 ProductPage schema. The examples consume the `initialResult` immediately,
 render deferred product details when `productDetails` completes, and render
-streamed `moreStuff` payload batches as they arrive.
+streamed `recommendations` payload batches as they arrive.
 
 The React Server Components example calls this executor directly in the server
 component and consumes the same async iterable on the server. The client-only
 React, Vue, Svelte, and Solid examples consume the async iterable in their
 framework bridges.
+
+The React Server Components example also passes the initial
+`product.summary` object into a Client Component. The test suite exercises that
+path with `react-server-dom-webpack` and shows that the raw GraphQL.js
+null-prototype object is rejected by the React Server Components serializer.
 
 ## Scripts
 

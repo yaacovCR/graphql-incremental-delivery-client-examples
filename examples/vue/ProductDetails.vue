@@ -2,7 +2,7 @@
 import { useDeferredFragment } from "./incremental";
 
 const details = useDeferredFragment<{ description: string }>("productDetails", [
-  "stuff",
+  "product",
 ]);
 </script>
 
